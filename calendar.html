@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        *{
+            padding: 0;
+            margin: 0;
+        }
+        
+        .show {
+            position: fixed;
+            right: 10px;
+            bottom: 10px;
+            height: 50px;
+            width: 80px;
+            background-color: hotpink;
+            line-height: 50px;
+            text-align: center;
+            color: #fff;
+            border-radius: 10px;
+            font-size: 20px;
+        }
+    
+        .rili{
+            width: 240px;
+            height: 300px;
+        }
+        ul{
+            height: 100%;
+        }
+        li {
+            list-style: none;
+            background-color: #f00;
+            /* height: 20px; */
+            
+        }
+        .weeks{
+            letter-spacing: 15px;
+            text-indent: 18px;
+            background-color: pink;
+        }
+        .alldays a{
+            display:inline-block;
+            height: 30px;
+            /* margin-left: 5px; */
+            text-decoration: none;
+            color: black;
+            text-indent: 5px;
+            letter-spacing: 5px;
+            font-size: 20px;
+        }
+        .alldays a:nth-child(1){
+            float: left;
+        }
+        .alldays a:nth-child(3){
+            float: right;
+            /* margin-left: 0; */
+            /* margin-right: 5px; */
+        }
+        .alldays  {
+           text-align: center;
+           height: 30px;
+           line-height: 30px;
+           background-color: #ccc;
+        }
+        .innernum{
+            word-spacing: 15px;
+            width: 100%;
+            background-color: #999;
+        }
+        .tables{
+            padding-left: 5px;
+            text-align: center;
+        }
+        .today {
+            background-color: #f00;
+        }
+        td {
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="show">日历</div>
+    <div class="rili">
+        <ul>
+            <li class="alldays"><a href="#"><</a><span id="days"></span><a href="#">></a></li>
+            <li class="weeks">一二三四五六日</li>
+            <li class="innernum">
+                <table class="tables" width ='235px' height = '160px' cellspacing='5' border-collapse ='collapse' >
+
+                </table>
+            </li>
+            
+        </ul>
+    </div>
+    <script>
+        let rili = document.querySelector('.rili');
+        let days = document.querySelector('#days');
+        let num = document.querySelector('.innernum');
+        let tab = document.querySelector('.tables');
+        let a1 = document.querySelector('.alldays a:nth-child(1)');
+        let a2 = document.querySelector('.alldays a:nth-child(3)')
+        // console.log(a1,a2);
+
+
+        let arr = [31,30,29,28]
+        window.onload = function (){
+            let day = new Date();
+           
+            function getday(){
+               
+            days.innerHTML = `${day.getFullYear()}年${day.getMonth()+1}月${day.getDate()}日`
+            let oneday =new Date( `${day.getFullYear()}/${day.getMonth()+1}/1`).getDay();
+            
+            if(oneday == 0){
+                oneday =7;
+            }
+
+            let monsday = 0 ;
+            
+            //--------------------获取对应月份天数
+            switch (day.getMonth()+1){
+                case 1 :
+                case 3 :
+                case 5 :
+                case 7 :
+                case 8 :
+                case 10 :
+                case 12 :
+                    monsday = arr[0];
+                    break;
+                case 2 :
+                    if(day.getFullYear()%4 ==0){
+                        monsday = arr[2]; 
+                    }else {
+                        monsday = arr[3]; 
+                    }
+                    break;
+                case 4 :    
+                case 6 :    
+                case 9 :    
+                case 11 :  
+                    monsday = arr[1];
+                    break;
+            }
+            // console.log(monsday)
+            //---------------------------渲染日期
+            let str='';
+            let smstr = '';
+            let daysarr =[];
+            for (let i=1;i<=monsday;i++){
+                daysarr.push(i);
+            }
+            for(let i=0;i<oneday-1;i++){
+                daysarr.unshift('');
+            }
+            for(let i=0;i<daysarr.length;i++){
+                if( daysarr[i] == day.getDate()){
+                    smstr +='<td class = "today">'+daysarr[i]+'</td>';
+
+                }else{
+                    smstr +='<td>'+daysarr[i]+'</td>';
+                }
+                if((i+1)%7 == 0 && i != 0){
+                    str += '<tr>'+ smstr + '</tr>';
+                    smstr ='';
+                }
+            }
+            str += '<tr>'+ smstr + '</tr>'; 
+            tab.innerHTML = str;
+            }
+            getday();
+            //------------------------a切换月份
+
+            a1.onclick=function(){
+                let m = day.getMonth()+1;
+                let y = day.getFullYear();
+                let d = day.getDate();
+
+
+                m--;
+                if(m == 0){
+                    y--
+                    m = 12;
+                }
+                day = new Date(y+'/'+m+'/'+d);
+                getday();
+            }
+            a2.onclick=function(){
+                let m = day.getMonth()+1;
+                let y = day.getFullYear();
+                let d = day.getDate();
+
+
+                m++;
+                if(m == 13){
+                    y++
+                    m = 1;
+                }
+                day = new Date(y+'/'+m+'/'+d);
+                getday();
+            }
+
+            //----------------------日期点击
+            tab.addEventListener('click',function(e){
+                if(e.target.nodeName === 'TD'){
+                    let tds = document.getElementsByClassName('today')[0];
+                    
+                    tds.className = '';
+                    e.target.className = 'today';
+
+                    days.innerHTML = `${day.getFullYear()}年${day.getMonth()+1}月${e.target.innerText}日`
+                }
+            })
+
+
+
+
+           
+        }
+        
+    
+    
+    </script>
+</body>
+</html>
