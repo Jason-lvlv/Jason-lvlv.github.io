@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes">
+    <title>现形加强</title>
+    <!--
+67ef0b7c574635c6f8a5d5e0caf24944
+4cc52c6851db9ecdfb657ec705754e1b
+2b8cf305d8e8fc2ca657eda60aa0b6ea
+b7fcb8a5e29bcc2cd2f9213341a67901
+-->
+</head>
+
+<body>
+    <style>
+        img {
+            max-width: 100%
+        }
+
+        #info2 {
+            word-break: break-all
+        }
+
+        summary {
+            font-size: 1.2rem
+        }
+
+        a {
+            color: #1080a0
+        }
+    </style>
+    <div style="padding:0 16px">
+        <h1>𝐈𝐈</h1>
+        <details>
+            <summary>制作</summary>
+            <span>选择表图</span><br><input type="file" id="ipt1" onchange="ipt1()" accept="image/*">
+            <br>
+            <span>选择里图</span><br><input type="file" id="ipt" onchange="ipt()" accept="image/*" multiple max="3">
+            <br>
+            <span>添加备注</span><input id="beizhucheckbox" type="checkbox" checked="true">
+            <br><input type="text" id="beizhu" style="width:150px" value="TK">
+            <br>
+            <span>表图压缩度 </span><select id="select" onchange="select()">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4" selected="true">4</option>
+            </select>
+            <br>
+            <span id="info1">建议里图大小：小于2M</span>
+            <br>
+            <button onclick="a1()">合成图片</button>
+            <br>
+            <img id="img1">
+            <br>
+            <a href="" id="a1" style="display:none">保存图片</a>
+        </details>
+
+        <details open id="reveal">
+            <summary>现形</summary>
+            <!-- <input type="file" id="ipt2" onchange="ipt2()" accept="image/*" multiple> -->
+            <input type="file" id="ipt2" onchange="ipt2()" multiple>
+            <div id="info2a" style="display:none">
+                <span id="info2"></span><span> </span><a href="" id="a2">保存图片</a>
+            </div>
+            <!-- <img src="" id="img2"> -->
+        </details>
+
+        
+    </div>
+
+
+    <script>
+        function utf8Encode(string) {
+            var utftext = "";
+            for (var n = 0; n < string.length; n++) {
+                var c = string.charCodeAt(n);
+                if (c < 128) {
+                    utftext += String.fromCharCode(c);
+                } else if ((c > 127) && (c < 2048)) {
+                    utftext += String.fromCharCode((c >> 6) | 192);
+                    utftext += String.fromCharCode((c & 63) | 128);
+                } else {
+                    utftext += String.fromCharCode((c >> 12) | 224);
+                    utftext += String.fromCharCode(((c >> 6) & 63) | 128);
+                    utftext += String.fromCharCode((c & 63) | 128);
+                }
+            }
+            return utftext;
+        }
+
+        function utf8Decode(inputStr) {
+            var outputStr = "";
+            var code1, code2, code3, code4;
+            for (var i = 0; i < inputStr.length; i++) {
+                code1 = inputStr.charCodeAt(i);
+                if (code1 < 128) {
+                    outputStr += String.fromCharCode(code1);
+                } else if (code1 < 224) {
+                    code2 = inputStr.charCodeAt(++i);
+                    outputStr += String.fromCharCode(((code1 & 31) << 6) | (code2 & 63));
+                } else if (code1 < 240) {
+                    code2 = inputStr.charCodeAt(++i);
+                    code3 = inputStr.charCodeAt(++i);
+                    outputStr += String.fromCharCode(((code1 & 15) << 12) | ((code2 & 63) << 6) | (code3 & 63));
+                } else {
+                    code2 = inputStr.charCodeAt(++i);
+                    code3 = inputStr.charCodeAt(++i);
+                    code4 = inputStr.charCodeAt(++i);
+                    outputStr += String.fromCharCode(((code1 & 7) << 18) | ((code2 & 63) << 12) | ((code3 & 63) << 6) |
+                        (code2 & 63));
+                }
+            }
+            return outputStr;
+        }
+    </script>
+    <script>
+        let IMG1 = new Image();
+        let IMGINFO = [];
+        let IMG2 = new Image();
+        let MODE = 4;
+        let SRC1 = "";
+        let SRC2 = "";
+
+        let errImgPicSrc="data:image/jpg;base64,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"
+
+
+        /**
+         * 多行参数
+        */
+        let onloadList=[]
+        let internalStorage = {}
+
+        /**
+         *  合成图片
+        */
+        function a1() {
+            requestAnimationFrame(function () {
+                requestAnimationFrame(function () {
+                    try {
+                        let f = gen(MODE);
+                        if (SRC1) {
+                            URL.revokeObjectURL(SRC1)
+                        }
+                        SRC1 = URL.createObjectURL(f);
+                        document.getElementById("a1").href = SRC1;
+                        document.getElementById("img1").src = SRC1;
+                        document.getElementById("a1").style.display = "inline";
+                        document.getElementById("a1").download = "download.png"
+                    } catch (e) {
+                        alert("图片生成失败")
+                    }
+                })
+            })
+        }
+
+        // function a2() {
+        //     try {
+        //         let f = sol();
+        //         if (SRC2) {
+        //             URL.revokeObjectURL(SRC2)
+        //         }
+        //         SRC2 = URL.createObjectURL(f[0]);
+        //         document.getElementById("a2").href = SRC2;
+        //         document.getElementById("img2").src = SRC2;
+        //         document.getElementById("info2a").style.display = "block";
+        //         document.getElementById("a2").download = f[1];
+        //         document.getElementById("info2").innerHTML = f[1]
+        //     } catch (e) {
+        //         alert("图片读取失败")
+        //     }
+        // }
+
+        function a2(img) {
+            console.dir(img )
+            try {
+                let f = sol(img);//------
+                if (internalStorage[img._name]) {
+                    URL.revokeObjectURL(internalStorage[img._name])
+                }
+                internalStorage[img._name] = URL.createObjectURL(f[0]);
+                
+            } catch (e) {
+                alert("图片读取失败")
+                internalStorage[img._name]= errImgPicSrc
+            }
+        }
+        function sol(img) {
+            let cv = document.createElement("canvas");
+            let cvd = cv.getContext("2d");
+            cv.width = img.width;
+            cv.height = img.height;
+            cvd.drawImage(img, 0, 0);
+            let imgdata = cvd.getImageData(0, 0, img.width, img.height);
+            if (imgdata.data[0] % 8 != 0 || imgdata.data[1] % 8 != 3 || imgdata.data[2] % 8 == 0 || imgdata.data[2] %
+                8 > 5) {
+                throw "error"
+            }
+            let klist = de(imgdata.data[2] % 8, imgdata);
+            let file = new File([klist[1].buffer], utf8Decode(klist[0][1]), {
+                type: klist[0][2]
+            })
+            return [file, utf8Decode(klist[0][1])]
+        }
+
+        function select() {
+            let l = [0, "500K", "1M", "1.5M", "2M"]
+            MODE = parseInt(document.getElementById("select").value);
+            document.getElementById("info1").innerHTML = "建议里图大小：小于" + l[MODE]
+        }
+
+        function ipt1() {
+            var oFReader = new FileReader();
+            var ofile = document.getElementById("ipt1").files[0];
+            oFReader.readAsDataURL(ofile);
+            oFReader.onloadend = function (oFRevent) {
+                var osrc = oFRevent.target.result;
+                IMG1.src = osrc;
+
+            }
+        }
+
+        function ipt() {
+            var oFReader = new FileReader();
+            // console.log('fileList', document.getElementById("ipt").files )
+            var ofile = document.getElementById("ipt").files[0];
+            oFReader.readAsArrayBuffer(ofile);
+            oFReader.onloadend = function (oFRevent) {
+                try {
+                    let l = new Uint8Array(oFRevent.target.result);
+                    IMGINFO = [
+                        [l.length, utf8Encode(ofile.name), ofile.type], l
+                    ];
+                } catch (e) {}
+            }
+        }
+
+        function ipt2() {
+            // var oFReader = new FileReader();
+            // var ofile = document.getElementById("ipt2").files[0];
+            // oFReader.readAsDataURL(ofile);
+            // oFReader.onloadend = function (oFRevent) {
+            //     var osrc = oFRevent.target.result;
+            //     IMG2.src = osrc;
+            //     IMG2.onload = function () {
+            //         a2()
+            //     }
+            // }
+
+            clearAllUrl()
+            var ofile = document.getElementById("ipt2").files;
+            console.log('ofile', ofile)
+            if(ofile.length) {
+                for(let i = 0; i < ofile.length ; i ++ ){
+                    let oFReader = new FileReader();
+                    oFReader.readAsDataURL(ofile[i]);
+                    let pros = new Promise((resolve , reject)=>{
+                        oFReader.onloadend = function (oFRevent) {
+                            var osrc = oFRevent.target.result;
+                            var newImage = new Image()
+                            newImage.src = osrc;
+                            newImage._name = ofile[i].name
+                            newImage.onload = function () {
+                                a2(newImage)
+                                resolve()
+                            }
+                        }
+                    })
+                    onloadList.push(pros)
+                    
+                }
+                showPics()
+            }else {
+                alert('请选择照片')
+            }
+            return 
+            
+        }
+        function clearAllUrl(){
+            for(let key in internalStorage){
+                URL.revokeObjectURL(internalStorage[key])
+            }
+            internalStorage = {}
+            let picsOuter=document.getElementById("picsOuter");
+            let outer=document.getElementById("reveal");
+            if(picsOuter && outer)  outer.removeChild(picsOuter);
+        }
+
+        function showPics (){
+            Promise.all(onloadList).then(()=>{
+                console.log('执行showPics', internalStorage)
+                if(Object.keys(internalStorage).length){
+                    let outer = document.querySelector('#reveal')
+                    let picsOuter = document.createElement('div')
+                    picsOuter.id = 'picsOuter'
+                    for(let key in internalStorage) {
+                        let pic = document.createElement('img')
+                        pic.src = internalStorage[key]
+                        pic.onerror= function () {this.src = errImgPicSrc}
+                        picsOuter.appendChild(pic)
+                    }
+                    outer.appendChild(picsOuter)
+                }
+            })
+            
+        }
+
+
+        function dataURLtoBlob(dataurl) {
+            var arr = dataurl.split(',');
+            var _arr = arr[1];
+            var mime = arr[0].match(/:(.*?);/)[1],
+                bstr = atob(_arr),
+                n = bstr.length,
+                u8arr = new Uint8Array(n);
+            while (n--) {
+                u8arr[n] = bstr.charCodeAt(n);
+            }
+            return new Blob([u8arr.buffer], {
+                type: mime
+            });
+        }
+
+        function gen(mode) {
+            let modelist = [0, 3, mode];
+            let word = IMGINFO[0].join(String.fromCharCode(1)) + String.fromCharCode(0);
+            let length = 2 + parseInt((word.length + IMGINFO[1].length) * 8 / (mode * 3))
+            let ax = Math.sqrt(length / (IMG1.width * IMG1.height));
+            let wid = Math.ceil(IMG1.width * ax);
+            let hit = Math.ceil(IMG1.height * ax);
+            let cv = document.createElement("canvas");
+            let cvd = cv.getContext("2d");
+            cv.width = wid;
+            cv.height = hit;
+            cvd.fillStyle = "#ffffff";
+            cvd.fillRect(0, 0, wid, hit);
+            cvd.drawImage(IMG1, 0, 0, wid, hit);
+
+            if (document.getElementById("beizhucheckbox").checked) {
+                let w = document.getElementById("beizhu").value;
+                cvd.font = "16px Arial";
+                cvd.textBaseline = "middle";
+                cvd.fillStyle = "rgba(255,255,255,0.75)";
+                cvd.fillRect(0, 0, cvd.measureText(w).width + 8, 28);
+                cvd.fillStyle = "#000000";
+                cvd.fillText(w, 4, 14, wid - 8);
+            }
+
+            return new File([dataURLtoBlob(en(mode, modelist, cvd.getImageData(0, 0, wid, hit), word, IMGINFO[1],
+                "wytk.github.io"))], "download.png", {
+                type: "image/png"
+            })
+        }
+
+        // function sol() {
+        //     let cv = document.createElement("canvas");
+        //     let cvd = cv.getContext("2d");
+        //     cv.width = IMG2.width;
+        //     cv.height = IMG2.height;
+        //     cvd.drawImage(IMG2, 0, 0);
+        //     let imgdata = cvd.getImageData(0, 0, IMG2.width, IMG2.height);
+        //     if (imgdata.data[0] % 8 != 0 || imgdata.data[1] % 8 != 3 || imgdata.data[2] % 8 == 0 || imgdata.data[2] %
+        //         8 > 5) {
+        //         throw "error"
+        //     }
+        //     let klist = de(imgdata.data[2] % 8, imgdata);
+        //     let file = new File([klist[1].buffer], utf8Decode(klist[0][1]), {
+        //         type: klist[0][2]
+        //     })
+        //     return [file, utf8Decode(klist[0][1])]
+        // }
+
+
+        function closer(mode, m, n) {
+            let a = m % mode
+            if (255 - m <= mode / 2 || m < mode / 2) {
+                return parseInt(m / mode) * mode + n
+            } else if (n - a > mode / 2) {
+                return parseInt(m / mode) * mode + n - mode
+            } else if (a - n >= mode / 2) {
+                return parseInt(m / mode) * mode + n + mode
+            } else {
+                return parseInt(m / mode) * mode + n
+            }
+        }
+
+
+        function en(mode, fplist, imgdata, aword, blist, cword) {
+            let aa = Math.ceil(8 / 3 / mode);
+            let n = imgdata.width * imgdata.height;
+            let j = 0;
+            let k = "";
+            let i = 1;
+            let mlist = [1, 2, 4, 8, 16, 32, 64, 128];
+            let cv = document.createElement("canvas");
+            let cvd = cv.getContext("2d");
+            cv.width = imgdata.width;
+            cv.height = imgdata.height;
+            imgdata.data[0] = closer(8, imgdata.data[0], fplist[0]);
+            imgdata.data[1] = closer(8, imgdata.data[1], fplist[1]);
+            imgdata.data[2] = closer(8, imgdata.data[2], fplist[2]);
+            while (i < n && j < aword.length) {
+                k = k + (aword.charCodeAt(j) + 256).toString(2).slice(1);
+                for (let ii = 0; ii < aa; ii++) {
+                    if (k.length >= mode * 3) {
+                        imgdata.data[4 * i] = closer(mlist[mode], imgdata.data[4 * i], parseInt(k.slice(0, mode), 2));
+                        imgdata.data[4 * i + 1] = closer(mlist[mode], imgdata.data[4 * i + 1], parseInt(k.slice(mode,
+                            mode * 2), 2));
+                        imgdata.data[4 * i + 2] = closer(mlist[mode], imgdata.data[4 * i + 2], parseInt(k.slice(mode *
+                            2, mode * 3), 2));
+                        k = k.slice(mode * 3);
+                        i++
+                    }
+                }
+                j++
+            }
+            j = 0;
+            while (i < n && j < blist.length) {
+                k = k + (blist[j] + 256).toString(2).slice(1);
+                for (let ii = 0; ii < aa; ii++) {
+                    if (k.length >= mode * 3) {
+                        imgdata.data[4 * i] = closer(mlist[mode], imgdata.data[4 * i], parseInt(k.slice(0, mode), 2));
+                        imgdata.data[4 * i + 1] = closer(mlist[mode], imgdata.data[4 * i + 1], parseInt(k.slice(mode,
+                            mode * 2), 2));
+                        imgdata.data[4 * i + 2] = closer(mlist[mode], imgdata.data[4 * i + 2], parseInt(k.slice(mode *
+                            2, mode * 3), 2));
+                        k = k.slice(mode * 3);
+                        i++
+                    }
+                }
+                j++
+            }
+            j = 0;
+            while (i < n) {
+                k = k + (cword.charCodeAt(j % cword.length) + 256).toString(2).slice(1);
+                for (let ii = 0; ii < aa; ii++) {
+                    if (k.length >= mode * 3) {
+                        imgdata.data[4 * i] = closer(mlist[mode], imgdata.data[4 * i], parseInt(k.slice(0, mode), 2));
+                        imgdata.data[4 * i + 1] = closer(mlist[mode], imgdata.data[4 * i + 1], parseInt(k.slice(mode,
+                            mode * 2), 2));
+                        imgdata.data[4 * i + 2] = closer(mlist[mode], imgdata.data[4 * i + 2], parseInt(k.slice(mode *
+                            2, mode * 3), 2));
+                        k = k.slice(mode * 3);
+                        i++
+                    }
+                }
+                j++
+            }
+            cvd.putImageData(imgdata, 0, 0);
+            return cv.toDataURL();
+        }
+
+        function de(mode, imgdata) {
+            let aa = Math.ceil(3 * mode / 8);
+            let n = imgdata.width * imgdata.height;
+            let j = 0;
+            let k = "";
+            let i = 1;
+            let mlist = [1, 2, 4, 8, 16, 32, 64, 128];
+            let word = "";
+            let blist //=new Uint8Array();
+            let blength = 0;
+            while (i < n && (word.length == 0 || word.slice(-1).charCodeAt(0) > 0)) {
+                k = k + (imgdata.data[4 * i] + 256).toString(2).slice(-mode);
+                k = k + (imgdata.data[4 * i + 1] + 256).toString(2).slice(-mode);
+                k = k + (imgdata.data[4 * i + 2] + 256).toString(2).slice(-mode);
+                i++
+                for (let ii = 0; ii < aa; ii++) {
+                    if (k.length >= 8 && (word.length == 0 || word.slice(-1).charCodeAt(0) > 0)) {
+                        word = word + String.fromCharCode(parseInt(k.slice(0, 8), 2));
+                        k = k.slice(8);
+                    }
+                }
+            }
+            //word分隔符:","
+            blength = parseInt(word.split(String.fromCharCode(1))[0]);
+            if (!(blength > -1)) {
+                throw "error"
+            }
+            if (!(word.split(String.fromCharCode(1)).length > 2)) {
+                throw "error"
+            }
+            blist = new Uint8Array(blength);
+            if (k.length >= 8 && j < blength) {
+                blist[j] = parseInt(k.slice(0, 8), 2);
+                k = k.slice(8);
+                j++
+            }
+            while (i < n && j < blength) {
+                k = k + (imgdata.data[4 * i] + 256).toString(2).slice(-mode);
+                k = k + (imgdata.data[4 * i + 1] + 256).toString(2).slice(-mode);
+                k = k + (imgdata.data[4 * i + 2] + 256).toString(2).slice(-mode);
+                i++
+                for (let ii = 0; ii < aa; ii++) {
+                    if (k.length >= 8 && j < blength) {
+                        blist[j] = parseInt(k.slice(0, 8), 2);
+                        k = k.slice(8);
+                        j++
+                    }
+                }
+            }
+            return [word.split(String.fromCharCode(0))[0].split(String.fromCharCode(1)), blist]
+        }
+        window.onload = function () {
+            // let w = "<!DOCTYPE " + "html>" + document.documentElement.outerHTML;
+            // document.getElementById("bc").href = URL.createObjectURL(new Blob([w], {
+            //     type: "text/html"
+            // }))
+        }
+    </script>
+</body>
+
+</html>
