@@ -96,22 +96,29 @@
     var vConsole = new VConsole();
 
     // 检查手机是否支持
+    // document.getElementById('title').onclick = function (){
+    //     console.log('asdsad')
+    // }
     
     if (window.DeviceOrientationEvent) {
 
         if (typeof DeviceOrientationEvent.requestPermission === 'function'){
-            console.log('发起请求陀螺仪')
-            DeviceOrientationEvent.requestPermission()
-            .then(permissionState => {
-                if (permissionState === 'granted') {
-                    addEventOrientation()
-                } else {
-                    alert("别拒绝啊😭")
-                }
-            })
-            .catch((err) => {
-                console.log(err)
-            });
+            console.log('需请求陀螺仪')
+            document.getElementById('title').onclick = function(){
+                console.log('触发点击');
+                DeviceOrientationEvent.requestPermission()
+                .then(permissionState => {
+                    if (permissionState === 'granted') {
+                        addEventOrientation()
+                    } else {
+                        alert("别拒绝啊😭")
+                    }
+                })
+                .catch((err) => {
+                    console.log(err)
+                });
+            }
+            
         }else {
             console.log('未发起请求');
             addEventOrientation()
