@@ -100,7 +100,7 @@
     if (window.DeviceOrientationEvent) {
 
         if (typeof DeviceOrientationEvent.requestPermission === 'function'){
-            console.log('发起请求')
+            console.log('发起请求陀螺仪')
             DeviceOrientationEvent.requestPermission()
             .then(permissionState => {
                 if (permissionState === 'granted') {
