@@ -96,8 +96,34 @@
     var vConsole = new VConsole();
 
     // 检查手机是否支持
+    
     if (window.DeviceOrientationEvent) {
-        console.log("支持方法")
+
+        if (typeof DeviceOrientationEvent.requestPermission === 'function'){
+            console.log('发起请求')
+            DeviceOrientationEvent.requestPermission()
+            .then(permissionState => {
+                if (permissionState === 'granted') {
+                    addEventOrientation()
+                } else {
+                    alert("别拒绝啊😭")
+                }
+            })
+            .catch((err) => {
+                console.log(err)
+            });
+        }else {
+            console.log('未发起请求');
+            addEventOrientation()
+        }
+        
+        
+    } else {
+        alert('您的浏览器不支持DeviceOrientation接口');
+    }
+
+
+    function addEventOrientation(){
         window.addEventListener('deviceorientation', function (event) {
             console.log("event" , event);
             if (event.alpha == null) {    // PC端提示
@@ -140,8 +166,6 @@
             ball.style.setProperty('--ball-x', `${ballX < 0 ? 0 : (ballX > xmax ? xmax : ballX)}px`);
             ball.style.setProperty('--ball-y', `${ballY < 0 ? 0 : (ballY > ymax ? ymax : ballY)}px`);
         }, false);
-    } else {
-        alert('您的浏览器不支持DeviceOrientation接口');
     }
 
     function calcOffset(beta, gamma) {
