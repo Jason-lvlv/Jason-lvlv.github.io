@@ -82,7 +82,7 @@
     <div id="ball"></div>
 
 </body>
-
+<script src="https://cdn.bootcss.com/vConsole/3.3.4/vconsole.min.js"></script>
 <script>
     /* 全局变量，calcOffset函数内更新 */
     var offsetX = 0;
@@ -93,19 +93,24 @@
     xmax = document.documentElement.clientWidth - 50;
     ymax = document.documentElement.clientHeight - 50;
 
+    var vConsole = new VConsole();
+   console.log("hello vconsole");
+
     // 检查手机是否支持
     if (window.DeviceOrientationEvent) {
         window.addEventListener('deviceorientation', (event) => {
 
             if (event.alpha == null) {    // PC端提示
                 info = document.getElementById('info');
-                info.innerHTML = 'DeviceOrientation接口回传的数据为空';
-                info.setAttribute('class', 'show');
+                // info.innerHTML = 'DeviceOrientation接口回传的数据为空';
+                // info.setAttribute('class', 'show');
                 return;
             }
             
             /* 根据beta和gamma值的变化更新偏移值 */
             calcOffset(event.beta, event.gamma);
+            console.log('offsetX',offsetX);
+            console.log('offsetY',offsetY);
             
             /* 显示当下的值 */
             document.getElementById('alpha').innerHTML = 'x = ' + (event.alpha).toFixed(2); // 东南西北朝向，正北为360/0
