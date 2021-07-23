@@ -13,6 +13,7 @@
         color: white;
         text-align: center;
         transition: all .5s ease-out;
+        min-height: 100vh;
     }
     h1 {
         --shadow-x: 3px;  
@@ -63,13 +64,7 @@
         transform: rotate(var(--deg)) skew(15deg, 15deg);
         /* --deg继承自父选择器 */
     }
-    /* span {
-        display: block;
-        width: 60px;
-        height: 20px;
-        background-color: #f00;
-        color: black;
-    } */
+    
 </style>
 <body>
     <h1 id="title">👋 Hello World!</h1>
@@ -96,15 +91,17 @@
     var vConsole = new VConsole();
 
     // 检查手机是否支持
-    // document.getElementById('title').onclick = function (){
-    //     console.log('asdsad')
-    // }
+    bodyEle.onclick = function (){
+        console.log('asdsad')
+    }
+    
     
     if (window.DeviceOrientationEvent) {
 
         if (typeof DeviceOrientationEvent.requestPermission === 'function'){
             console.log('需请求陀螺仪')
-            document.getElementById('title').onclick = function(){
+            const bodyEle =  document.getElementsByTagName('body')[0]
+            bodyEle.onclick = function(){
                 console.log('触发点击');
                 DeviceOrientationEvent.requestPermission()
                 .then(permissionState => {
@@ -118,6 +115,9 @@
                     console.log(err)
                 });
             }
+
+            bodyEle.click()
+
             
         }else {
             console.log('未发起请求');
