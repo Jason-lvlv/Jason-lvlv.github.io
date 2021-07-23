@@ -94,15 +94,14 @@
     ymax = document.documentElement.clientHeight - 50;
 
     var vConsole = new VConsole();
-   console.log("hello vconsole");
 
     // 检查手机是否支持
     if (window.DeviceOrientationEvent) {
         window.addEventListener('deviceorientation', (event) => {
-
+            console.log("event" , event);
             if (event.alpha == null) {    // PC端提示
                 info = document.getElementById('info');
-                // info.innerHTML = 'DeviceOrientation接口回传的数据为空';
+                info.innerHTML = 'DeviceOrientation接口回传的数据为空';
                 // info.setAttribute('class', 'show');
                 return;
             }
