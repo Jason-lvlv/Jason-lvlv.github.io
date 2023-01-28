@@ -19,7 +19,10 @@
 	function tanchujingao () {
 		let wenzi = document.getElementById("wenzi");
 		wenzi.className = 'rotateP';
-		console.log('wenzi', wenzi);	
+		
+		setTimeout(() => {
+			window.open('/otherHtml/shuaige.html')
+		}, 5000)
 	}
 </script>
 </head>
@@ -44,7 +47,7 @@
 		}
 	}
 	.rotateP {
-		animation:moveWenZi 10s  infinite;
+		animation:moveWenZi 3s  infinite;
 	}
 </style>
 <body>
