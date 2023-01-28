@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -10,5 +10,51 @@
         <p><a href="/otherHtml/calendar.html">跳转日历</a></p>
         <p><a href="/mobx-ts-todo/index.html">Mobx-todo</a></p>
         <p><a href="/otherHtml/DeviceOrientationEvent.html">陀螺仪（H5）</a></p>
+</body>
+</html> -->
+
+<!DOCTYPE html>
+<head>
+<script>
+	function tanchujingao () {
+		let wenzi = document.getElementById("wenzi");
+		wenzi.className = 'rotateP';
+		console.log('wenzi', wenzi);	
+	}
+</script>
+</head>
+
+<style>
+	body{   
+		background-color: #ff0;	
+	}
+	#wenzi{
+		font-size: 90px;
+		text-align: center;
+		padding-top: 90px;
+			
+	}
+	@keyframes moveWenZi {
+		0% { 
+			transform:rotate(10deg);
+		 }
+		50% { transform:rotate(-10deg); }
+		100% {
+			transform:rotate(10deg);
+		}
+	}
+	.rotateP {
+		animation:moveWenZi 10s  infinite;
+	}
+</style>
+<body>
+
+
+<div onclick="tanchujingao()" >
+	<div id="wenzi">我是帅哥哥</span>
+</div>
+
+
+
 </body>
 </html>
